@@ -1,0 +1,13 @@
+[program:server_ongs]
+command=/home/ubuntu/venv/bin/gunicorn -w 1 -b 0.0.0.0:8081 -k gevent --threads 2 --timeout 60 --max-requests 500 --max-requests-jitter 50 app:app
+directory=/home/ubuntu/ongs
+autostart=true
+autorestart=true
+startsecs=5
+startretries=3
+stderr_logfile=/home/ubuntu/logs/server_ongs_err.log
+stdout_logfile=/home/ubuntu/logs/server_ongs_out.log
+stdout_logfile_maxbytes=10MB
+stdout_logfile_backups=5
+user=ubuntu
+environment=PATH="/home/ubuntu/ongs/venv/bin:/usr/bin:/bin", VIRTUAL_ENV="/home/ubuntu/ongs/venv", PYTHONPATH="/home/ubuntu"

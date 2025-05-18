@@ -1,0 +1,11 @@
+Flask==2.3.3                # Framework web principal
+Flask-SQLAlchemy==3.1.1     # ORM para trabalhar com banco relacional
+Flask-Migrate==4.0.5        # Comando de migração de banco de dados
+Flask-WTF==1.2.1            # Formulários seguros com CSRF
+WTForms==3.1.2              # Validação de formulários
+email-validator==2.1.0      # Validação de campos de e-mail
+PyMySQL==1.1.0              # Conector de banco de dados MariaDB/MySQL via Python
+python-dotenv==1.0.1        # Carregar variáveis de ambiente do .env (como credenciais do banco)
+
+# Se quiser rodar em produção:
+gunicorn==21.2.0            # Servidor WSGI para Linux/produção (não precisa no Windows/dev)

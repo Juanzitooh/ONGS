@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Sobre Nós{% endblock %}
+
+{% block content %}
+<section class="sobre">
+    <h2>Nossa História</h2>
+    <p>{{ sobre.historia }}</p>
+
+    <h2>Missão</h2>
+    <p>{{ sobre.missao }}</p>
+
+    <h2>Visão</h2>
+    <p>{{ sobre.visao }}</p>
+
+    <h2>Valores</h2>
+    <ul>
+        {% for valor in sobre.valores %}
+        <li>{{ valor }}</li>
+        {% endfor %}
+    </ul>
+
+    <h2>Nossa Equipe</h2>
+    <p>{{ sobre.equipe }}</p>
+
+    <h2>Parceiros e Reconhecimentos</h2>
+    <p>{{ sobre.parceiros }}</p>
+
+    <a href="{{ url_for('ong.ajuda', slug=slug) }}" class="btn">Veja como você pode ajudar</a>
+</section>
+{% endblock %}

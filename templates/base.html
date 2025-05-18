@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ ong.nome }} - {% block title %}{% endblock %}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+<header>
+    <div class="container">
+        <h1>{{ ong.nome }}</h1>
+        <p>{{ ong.descricao }}</p>
+        <nav>
+            <ul>
+                <li><a href="{{ url_for('ong.index', slug=slug) }}">Início</a></li>
+                <li><a href="{{ url_for('ong.sobre', slug=slug) }}">Sobre</a></li>
+                <li><a href="{{ url_for('ong.projetos', slug=slug) }}">Projetos</a></li>
+                <li><a href="{{ url_for('ong.ajuda', slug=slug) }}">Como Ajudar</a></li>
+                <li><a href="{{ url_for('ong.contato', slug=slug) }}">Contato</a></li>
+            </ul>
+        </nav>
+    </div>
+</header>
+
+<main class="container">
+    {% block content %}{% endblock %}
+</main>
+
+<footer class="container">
+    <p>&copy; {{ ong.nome }} - Todos os direitos reservados.</p>
+</footer>
+</body>
+</html>

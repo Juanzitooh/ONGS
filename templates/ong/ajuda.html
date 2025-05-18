@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Como Ajudar{% endblock %}
+
+{% block content %}
+<section class="ajuda">
+    <h2>Como Você Pode Ajudar</h2>
+    <p>Existem várias formas de apoiar os projetos da {{ ong.nome }}:</p>
+
+    <div class="formas-de-ajuda">
+        {% for forma in ajuda.formas %}
+        <div class="forma">
+            <h3>{{ forma.icone }} {{ forma.titulo }}</h3>
+            <p>{{ forma.descricao }}</p>
+        </div>
+        <hr>
+        {% endfor %}
+    </div>
+
+    <a href="{{ url_for('ong.contato', slug=slug) }}" class="btn">Entrar em Contato</a>
+</section>
+{% endblock %}

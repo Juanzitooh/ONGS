@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+{% block title %}Projetos{% endblock %}
+
+{% block content %}
+<section class="projetos">
+    <h2>Projetos em Destaque</h2>
+    {% for projeto in projetos %}
+    <div class="projeto">
+        <h3>{{ projeto.titulo }}</h3>
+        <p>{{ projeto.descricao }}</p>
+        {% if projeto.imagem %}
+        <img src="{{ url_for('static', filename='imagens/' ~ projeto.imagem) }}" alt="{{ projeto.titulo }}">
+        {% endif %}
+        <p>Status: <strong>{{ projeto.status }}</strong></p>
+    </div>
+    <hr>
+    {% endfor %}
+
+    <a href="{{ url_for('ong.ajuda', slug=slug) }}" class="btn">Contribua com um Projeto</a>
+</section>
+{% endblock %}
