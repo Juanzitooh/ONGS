@@ -71,8 +71,8 @@ Para isso criamos esse guia com o script passoa a passo de como usar o  script d
 No terminal, clone o repositório e entre na pasta do projeto:
 
 ```bash
-git clone https://github.com/juanzitooh/ongs.git
-cd ongs
+git clone https://github.com/juanzitooh/ONGS.git
+cd ONGS
 ````
 
 ---
@@ -80,7 +80,7 @@ cd ongs
 ## 2. Pré-requisitos
 
 * Computador ou instancia com Usuário Linux com permissão `sudo` (exemplo: `ubuntu`)
-* Domínio configurado no Cloudflare (exemplo: `seudominio.com`)
+* Domínio configurado no Cloudflare (exemplo: `seudominio.com.br`)
 * Caso o domínio **não esteja configurado no Cloudflare e ou nao tenha uma chave token da api da cloudefire**, siga o passo 3
 * Se ja tem a chave api e seu dominio usa a cloudfire... vá direto para a edição do setup.
 ---
@@ -104,25 +104,55 @@ Guarde esse token para usar no passo seguinte.
 
 ---
 
-## 4. Editando o script `setup.sh` e o config.py
 
+## 4. Configurando o ambiente (.env)
 
-
-Abre o arquivo `config.py` e edite a variavel: DOMINIO = 'seudominio.com.br'.
-
-Copie o 'seudominio.com.br' de DOMINIO PARA DOMAIN mesmo dominio em ambos os arquivos para sicronizar as ongs como subdominios seus.
-
-Abra o arquivo `setup.sh` no seu editor preferido e configure as variáveis de configurações abaixo:
-
-```bash
-DOMAIN="seudominio.com.br" aqui será o nome do seu site .
-EMAIL="seu-email@exemplo.com" aqui é um email de contato para suas ongs entrarem em contato.
-CF_API_TOKEN="SEU_API_TOKEN_AQUI" esse é sua api feita na cloudfire após ela virar seu gerenciador dns.
-```
-
-> Por padrão todas as outras variaveis ja estão funcionais, mas caso queira mudar serão nescessários testes adicionais...
+O arquivo `.env` centraliza as variáveis sensíveis e personalizáveis do seu projeto. Basta editar **apenas este arquivo** para ajustar o domínio, e-mail e API da Cloudflare.
 
 ---
+
+###  Renomeie o `.env.example` para `.env`
+
+```bash
+cp .env.example .env
+```
+
+---
+
+###  Edite o `.env`
+
+Abra o `.env` com seu editor favorito e edite **apenas essas 3 variáveis**:
+
+```env
+DOMAIN=seudominio.com.br         # Seu domínio principal (ex: meusite.com.br)
+EMAIL=seu-email@exemplo.com      # Email de contato das ONGs
+CF_API_TOKEN=SEU_API_TOKEN_AQUI  # Token da Cloudflare com permissões de DNS
+```
+
+As demais variáveis estão fixas e já configuradas para funcionar corretamente.
+
+---
+
+###  Como isso é usado no projeto?
+
+* O `setup.sh` carrega o `.env` automaticamente usando `source .env`.
+* O `config.py` usa `python-dotenv` para ler essas variáveis:
+
+```python
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+
+DOMAIN = os.getenv("DOMAIN")
+EMAIL = os.getenv("EMAIL")
+CF_API_TOKEN = os.getenv("CF_API_TOKEN")
+```
+
+> **Você não precisa editar mais nada.** Toda a configuração é feita com base nesse `.env`.
+
+---
+
 
 ## 5. Executando o script de setup
 
@@ -149,7 +179,7 @@ O script irá preparar tudo e deixar o ongs online nos subdominios do seu site/s
 
 Após o script terminar, confirme:
 
-* Seu app está rodando no Gunicorn na porta configurada (padrão 8081).
+* Seu app está rodando no Gunicorn na porta configurada (padrão 8081, veja nos logs).
 * Nginx está redirecionando para HTTPS com certificado válido (acesse no navegador: ongs.seudominio.com.br).
 * Logs do app estão sendo gerados na pasta configurada (pasta logs).
 * Certificado SSL está ativo e a renovação automática está agendada (veja se no site aparece um cadeado verde indicando que é seguro acessar.)

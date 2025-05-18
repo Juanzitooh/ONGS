@@ -1,6 +1,12 @@
-# Coloque aqui o dominio principal do seu site.
+from dotenv import load_dotenv
+import os
 
-DOMINIO = "seudominio.com.br" 
+# Carrega o .env automaticamente
+load_dotenv()
+
+# Recupera valores do ambiente
+DOMAIN = os.environ.get("DOMAIN", "seudominio.com.br")
+
 class Config:
-    SECRET_KEY = 'uma-chave-secreta'
-    DEBUG = True
+    SECRET_KEY = os.environ.get("SECRET_KEY", "uma-chave-secreta")
+    DEBUG = os.environ.get("DEBUG", "True").lower() in ("true", "1", "yes")

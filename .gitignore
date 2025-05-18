@@ -1,0 +1,41 @@
+# Ignorar variáveis de ambiente e configurações locais
+.env
+*.env
+
+# Ignorar ambientes virtuais
+venv/
+ENV/
+env/
+.venv/
+
+# Ignorar cache e arquivos temporários do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+*.log
+*.sqlite3
+*.db
+
+# Ignorar configurações do sistema operacional
+.DS_Store
+Thumbs.db
+
+# Ignorar arquivos do VSCode
+.vscode/
+
+# Ignorar arquivos do supervisor (se gerados localmente)
+*.pid
+*.sock
+
+# Ignorar logs
+logs/
+*.log
+
+# Ignorar arquivos do pip
+pip-log.txt
+
+# Ignorar backups ou arquivos temporários
+*~
+*.bak
+*.tmp

@@ -6,34 +6,56 @@
 ##### ATENÇAO LEIA O ARQUIVO README.md ANTES DE RODAR O SCRIPT.
 # no item 5 de Setup Linux TEM TODAS AS INSTRUÇÕES...
 
-### CONFIGURAÇÕES GERAIS (troque para seu dominio e para sua api da cloudfire) ###
-DOMAIN="seudominio.com.br"
-EMAIL="seu-email@exemplo.com"
-CF_API_TOKEN="SEU_API_TOKEN_AQUI"
-## Configurações opcionais
-PROJECT_NAME="ongs"
-PROJECT_PORT="8081"
-PROJECT_USER="ubuntu"
-PROJECT_DIR="/home/$PROJECT_USER/$PROJECT_NAME"
+# Carrega variáveis do .env
+if [ ! -f .env ]; then
+  echo "Arquivo .env não encontrado!"
+  exit 1
+fi
+
+# Exporta as variáveis do .env
+export $(grep -v '^#' .env | xargs -d '\n')
+
+# Debug: Mostrar configurações carregadas
+echo "Dominio: $DOMAIN"
+echo "Email: $EMAIL"
+echo "Usuário: $PROJECT_USER"
+echo "Porta: $PROJECT_PORT"
+echo "Diretório do Projeto: $PROJECT_DIR"
+echo "Virtualenv: $VENV_DIR"
+echo "Requirements: $REQUIREMENTS"
+echo "Logs: $LOG_DIR"
+echo "Supervisor: $SUPERVISOR_CONF"
+echo "NGINX: $NGINX_CONF"
+echo "Cloudflare Credentials: $CF_API_CREDENTIALS"
+echo "Gunicorn: workers=$GUNICORN_WORKERS, threads=$GUNICORN_THREADS"
+
+#variaveis de directorio
+PROJECT_DIR="/home/$PROJECT_USER/ONGS"
 VENV_DIR="$PROJECT_DIR/venv"
 REQUIREMENTS="$PROJECT_DIR/requirements.txt"
 LOG_DIR="/home/$PROJECT_USER/logs"
 SUPERVISOR_CONF_DIR="/etc/supervisor/conf.d"
-SUPERVISOR_CONF="${SUPERVISOR_CONF_DIR}/server_${PROJECT_NAME}.conf"
-NGINX_CONF="/etc/nginx/sites-available/$PROJECT_NAME"
-NGINX_LINK="/etc/nginx/sites-enabled/$PROJECT_NAME"
+SUPERVISOR_CONF="${SUPERVISOR_CONF_DIR}/server_ONGS.conf"
+NGINX_CONF="/etc/nginx/sites-available/ONGS"
+NGINX_LINK="/etc/nginx/sites-enabled/ONGS"
 CF_API_CREDENTIALS="/home/$PROJECT_USER/.cloudflare.ini"
-GUNICORN_WORKERS=1
-GUNICORN_THREADS=2
-GUNICORN_TIMEOUT=60
-GUNICORN_MAX_REQUESTS=500
-GUNICORN_JITTER=50
 
 ### INÍCIO DO SCRIPT ###
 echo "Atualizando sistema e verificando configuraçoes gerais..."
 
+# Verificação de variáveis essenciais
 if [[ "$CF_API_TOKEN" == "SEU_API_TOKEN_AQUI" ]]; then
-  echo "Erro: Por favor, defina o CF_API_TOKEN antes de executar o script."
+  echo "Erro: Por favor, defina o CF_API_TOKEN corretamente no .env antes de executar o script."
+  exit 1
+fi
+
+if [[ "$DOMAIN" == "seudominio.com.br" ]]; then
+  echo "Erro: Por favor, defina o DOMAIN corretamente no .env antes de executar o script."
+  exit 1
+fi
+
+if [[ "$EMAIL" == "seu-email@exemplo.com" ]]; then
+  echo "Erro: Por favor, defina o EMAIL corretamente no .env antes de executar o script."
   exit 1
 fi
 
@@ -120,15 +142,15 @@ sudo chown $PROJECT_USER:$PROJECT_USER $LOG_DIR
 
 echo "Configurando Supervisor..."
 sudo bash -c "cat > $SUPERVISOR_CONF" <<EOL
-[program:server_${PROJECT_NAME}]
+[program:server_ONGS]
 command=$VENV_DIR/bin/gunicorn -w $GUNICORN_WORKERS -b 0.0.0.0:$PROJECT_PORT -k gevent --threads $GUNICORN_THREADS --timeout $GUNICORN_TIMEOUT --max-requests $GUNICORN_MAX_REQUESTS --max-requests-jitter $GUNICORN_JITTER app:app
 directory=$PROJECT_DIR
 autostart=true
 autorestart=true
 startsecs=5
 startretries=3
-stderr_logfile=$LOG_DIR/server_${PROJECT_NAME}_err.log
-stdout_logfile=$LOG_DIR/server_${PROJECT_NAME}_out.log
+stderr_logfile=$LOG_DIR/server_ONGS_err.log
+stdout_logfile=$LOG_DIR/server_ONGS_out.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
 user=$PROJECT_USER
@@ -138,7 +160,7 @@ EOL
 echo "Recarregando Supervisor..."
 sudo supervisorctl reread
 sudo supervisorctl update
-sudo supervisorctl restart server_${PROJECT_NAME}
+sudo supervisorctl restart server_ONGS
 
 if [ ! -f "$CF_API_CREDENTIALS" ]; then
     echo "Criando credenciais da API do Cloudflare..."
