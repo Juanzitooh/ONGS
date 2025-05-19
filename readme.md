@@ -2,6 +2,8 @@
 
 Bem-vindo ao **ONGS**, uma plataforma **open source** mantida pela [JPTech Solutions](https://jptechsolutions.com.br), criada para que organizações **sem fins lucrativos** tenham seu **próprio site institucional** — de forma **100% gratuita**, **personalizada** e **disponível 24 horas por dia**.
 
+[Ver Exemplo](https://exemplo.jptechsolutions.com.br/)
+
 Este projeto nasceu com propósito social, utilizando tecnologias modernas como **Python**, **Gunicorn**, **Nginx**, **Supervisor** e **Certbot**, para facilitar a presença digital de iniciativas que realmente importam.
 
 ---

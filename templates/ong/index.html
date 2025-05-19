@@ -3,7 +3,7 @@
 
 {% block content %}
 <section class="banner">
-    <img src="{{ url_for('static', filename='images/' ~ ong.banner) }}" alt="Banner da ONG {{ ong.nome }}">
+    <img src="{{ url_for('ongs.static', filename='images/' ~ ong.banner) }}" alt="Banner da ONG {{ ong.nome }}">
 </section>
 
 <section class="mission">

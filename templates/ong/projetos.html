@@ -9,7 +9,7 @@
         <h3>{{ projeto.titulo }}</h3>
         <p>{{ projeto.descricao }}</p>
         {% if projeto.imagem %}
-        <img src="{{ url_for('static', filename='imagens/' ~ projeto.imagem) }}" alt="{{ projeto.titulo }}">
+        <img src="{{ url_for('ongs.static', filename='images/' ~ projeto.imagem) }}" alt="{{ projeto.titulo }}">
         {% endif %}
         <p>Status: <strong>{{ projeto.status }}</strong></p>
     </div>

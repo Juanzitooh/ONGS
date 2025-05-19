@@ -1,5 +1,5 @@
 from flask import Blueprint, render_template
-from database.models import get_ong_by_slug, get_sobre_by_slug
+from database.models import get_ong_by_slug, get_sobre_by_slug, get_projetos_by_slug, get_ajuda_by_slug, get_contato_by_slug
 
 # Cria um Blueprint chamado 'ong' que responde para subdomínios dinâmicos,
 # onde o subdomínio é recebido como variável <slug>.

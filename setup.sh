@@ -13,10 +13,13 @@ if [ ! -f .env ]; then
 fi
 
 # Exporta as variáveis do .env
-export $(grep -v '^#' .env | xargs -d '\n')
+set -o allexport
+source <(grep -E '^[A-Za-z_][A-Za-z0-9_]*=' .env | sed 's/#.*//g' | sed 's/[[:space:]]*$//')
+set +o allexport
 
 #variaveis de directorio
 PROJECT_DIR="/home/$PROJECT_USER/ONGS"
+USER_DIR="/home/$PROJECT_USER"
 VENV_DIR="$PROJECT_DIR/venv"
 REQUIREMENTS="$PROJECT_DIR/requirements.txt"
 LOG_DIR="/home/$PROJECT_USER/logs"
@@ -70,8 +73,15 @@ else
     echo "python3-venv já está disponível."
 fi
 
+# Verifica se já existe e remove, se sim
+if [ -d "$VENV_DIR" ]; then
+    echo "Virtualenv já existe em $VENV_DIR. Removendo..."
+    rm -rf "$VENV_DIR"
+fi
+
+# Cria o novo ambiente virtual
 echo "Criando virtualenv em $VENV_DIR..."
-python3 -m venv $VENV_DIR
+python3 -m venv "$VENV_DIR"
 
 echo "Ativando virtualenv e instalando requirements.txt..."
 source $VENV_DIR/bin/activate
@@ -128,7 +138,7 @@ sudo chown $PROJECT_USER:$PROJECT_USER $LOG_DIR
 echo "Configurando Supervisor..."
 sudo bash -c "cat > $SUPERVISOR_CONF" <<EOL
 [program:server_ONGS]
-command=$VENV_DIR/bin/gunicorn -w $GUNICORN_WORKERS -b 0.0.0.0:$PROJECT_PORT -k gevent --threads $GUNICORN_THREADS --timeout $GUNICORN_TIMEOUT --max-requests $GUNICORN_MAX_REQUESTS --max-requests-jitter $GUNICORN_JITTER app:app
+command=$VENV_DIR/bin/gunicorn -w $GUNICORN_WORKERS -b 0.0.0.0:$PROJECT_PORT --threads $GUNICORN_THREADS --timeout $GUNICORN_TIMEOUT --max-requests $GUNICORN_MAX_REQUESTS --max-requests-jitter $GUNICORN_JITTER app:app
 directory=$PROJECT_DIR
 autostart=true
 autorestart=true
@@ -139,7 +149,7 @@ stdout_logfile=$LOG_DIR/server_ONGS_out.log
 stdout_logfile_maxbytes=10MB
 stdout_logfile_backups=5
 user=$PROJECT_USER
-environment=PATH="$VENV_DIR/bin:/usr/bin:/bin",VIRTUAL_ENV="$VENV_DIR",PYTHONPATH="$PROJECT_DIR"
+environment=PATH="$VENV_DIR/bin:/usr/bin:/bin",VIRTUAL_ENV="$VENV_DIR",PYTHONPATH="$USER_DIR"
 EOL
 
 echo "Recarregando Supervisor..."
@@ -147,19 +157,32 @@ sudo supervisorctl reread
 sudo supervisorctl update
 sudo supervisorctl restart server_ONGS
 
-if [ ! -f "$CF_API_CREDENTIALS" ]; then
-    echo "Criando credenciais da API do Cloudflare..."
-    sudo bash -c "cat > $CF_API_CREDENTIALS" <<EOF
-dns_cloudflare_api_token = $CF_API_TOKEN
-EOF
-    sudo chmod 600 $CF_API_CREDENTIALS
-    sudo chown $PROJECT_USER:$PROJECT_USER $CF_API_CREDENTIALS
-else
-    echo "Arquivo de credenciais da API do Cloudflare já existe."
+echo "Limpando variável DOMAIN (removendo aspas, se houver)..."
+DOMAIN=$(echo "$DOMAIN" | tr -d '"')
+
+echo "Criando (ou substituindo) credenciais da API do Cloudflare..."
+
+# Se o arquivo existir, remove primeiro para evitar problemas
+if [ -f "$CF_API_CREDENTIALS" ]; then
+    sudo rm -f "$CF_API_CREDENTIALS"
 fi
 
+# Cria o arquivo com conteúdo
+sudo bash -c "cat > $CF_API_CREDENTIALS" <<EOF
+dns_cloudflare_api_token = $CF_API_TOKEN
+EOF
+
+# Ajusta permissões e dono
+sudo chmod 600 "$CF_API_CREDENTIALS"
+sudo chown "$PROJECT_USER:$PROJECT_USER" "$CF_API_CREDENTIALS"
+
 echo "Configurando Nginx para wildcard..."
-sudo bash -c "cat > $NGINX_CONF" <<EOL
+
+# Remove o arquivo antigo se existir
+sudo rm -f "$NGINX_CONF"
+
+# Sobrescreve com tee (funciona melhor com sudo)
+sudo tee "$NGINX_CONF" > /dev/null <<EOL
 server {
     listen 80;
     server_name ~^(?<subdomain>.+)\.${DOMAIN}\$;
@@ -183,9 +206,12 @@ server {
 }
 EOL
 
-if [ ! -L "$NGINX_LINK" ]; then
-    sudo ln -s $NGINX_CONF $NGINX_LINK
-fi
+# Exibe o conteúdo do arquivo criado
+echo "Conteúdo do arquivo $NGINX_CONF:"
+sudo cat "$NGINX_CONF"
+# Recria symlink
+sudo rm -f "$NGINX_LINK"
+sudo ln -s "$NGINX_CONF" "$NGINX_LINK"
 
 echo "Testando configuração do Nginx..."
 sudo nginx -t && sudo systemctl reload nginx
@@ -193,9 +219,9 @@ sudo nginx -t && sudo systemctl reload nginx
 echo "Solicitando certificado SSL wildcard via DNS Cloudflare..."
 sudo certbot certonly \
   --dns-cloudflare \
-  --dns-cloudflare-credentials $CF_API_CREDENTIALS \
+  --dns-cloudflare-credentials "$CF_API_CREDENTIALS" \
   -d "*.${DOMAIN}" -d "${DOMAIN}" \
-  --agree-tos --no-eff-email --email $EMAIL --non-interactive
+  --agree-tos --no-eff-email --email "$EMAIL" --non-interactive
 
 echo "Recarregando Nginx para aplicar certificado..."
 sudo systemctl reload nginx
