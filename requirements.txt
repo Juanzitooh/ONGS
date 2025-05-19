@@ -8,4 +8,4 @@ PyMySQL==1.1.0              # Conector de banco de dados MariaDB/MySQL via Pytho
 python-dotenv==1.0.1        # Carregar variáveis de ambiente do .env (como credenciais do banco)
 
 # Se quiser rodar em produção:
-gunicorn==21.2.0            # Servidor WSGI para Linux/produção (não precisa no Windows/dev)
+gunicorn==21.2.0            # Servidor WSGI para Linux/produção

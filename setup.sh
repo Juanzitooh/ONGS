@@ -15,29 +15,14 @@ fi
 # Exporta as variáveis do .env
 export $(grep -v '^#' .env | xargs -d '\n')
 
-# Debug: Mostrar configurações carregadas
-echo "Dominio: $DOMAIN"
-echo "Email: $EMAIL"
-echo "Usuário: $PROJECT_USER"
-echo "Porta: $PROJECT_PORT"
-echo "Diretório do Projeto: $PROJECT_DIR"
-echo "Virtualenv: $VENV_DIR"
-echo "Requirements: $REQUIREMENTS"
-echo "Logs: $LOG_DIR"
-echo "Supervisor: $SUPERVISOR_CONF"
-echo "NGINX: $NGINX_CONF"
-echo "Cloudflare Credentials: $CF_API_CREDENTIALS"
-echo "Gunicorn: workers=$GUNICORN_WORKERS, threads=$GUNICORN_THREADS"
-
 #variaveis de directorio
 PROJECT_DIR="/home/$PROJECT_USER/ONGS"
 VENV_DIR="$PROJECT_DIR/venv"
 REQUIREMENTS="$PROJECT_DIR/requirements.txt"
 LOG_DIR="/home/$PROJECT_USER/logs"
-SUPERVISOR_CONF_DIR="/etc/supervisor/conf.d"
 SUPERVISOR_CONF="${SUPERVISOR_CONF_DIR}/server_ONGS.conf"
-NGINX_CONF="/etc/nginx/sites-available/ONGS"
-NGINX_LINK="/etc/nginx/sites-enabled/ONGS"
+NGINX_CONF="${NGINX_CONF_DIR}/ONGS"
+NGINX_LINK="${NGINX_ENABLED_DIR}/ONGS"
 CF_API_CREDENTIALS="/home/$PROJECT_USER/.cloudflare.ini"
 
 ### INÍCIO DO SCRIPT ###
