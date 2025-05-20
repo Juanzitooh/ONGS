@@ -3,7 +3,10 @@ def get_ong_by_slug(slug):
         "exemplo": {
             "nome": "ABRA",
             "descricao": "Proteção Animal",
-            "banner": "banner_exemplo.jpg"
+            "banner": "banner_exemplo.jpg",
+            "logo_icone": "exemplo.png",
+            "instagram": "https://www.instagram.com/",
+            "facebook": "https://www.facebook.com/"
         }
     }.get(slug)
 
